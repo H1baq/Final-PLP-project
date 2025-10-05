@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1067712099961",
+    "project_id": "know-your-flow-26e8d",
+    "storage_bucket": "know-your-flow-26e8d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067712099961:android:5aeff2e16d2bbbe6de86a8",
+        "android_client_info": {
+          "package_name": "com.example.know_your_flow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSgfueAnLN-F2yKTUxcqEoVmlWKDFqjSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
