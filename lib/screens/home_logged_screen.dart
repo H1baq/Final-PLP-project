@@ -42,6 +42,7 @@ class HomeLoggedScreen extends StatelessWidget {
             icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Logout',
             onPressed: () async {
+              
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(

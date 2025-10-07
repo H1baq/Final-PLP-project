@@ -7,7 +7,7 @@ import 'package:device_preview/device_preview.dart';
 import 'theme.dart';
 import 'screens/home_public_screen.dart';
 import 'screens/home_logged_screen.dart';
-import 'screens/tracker_screen.dart';
+import 'screens/period_tracker_screen.dart';
 import 'screens/education_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile_setup_screen.dart';
@@ -44,18 +44,18 @@ class KnowYourFlowApp extends StatelessWidget {
       // ✅ Define app navigation flow
       initialRoute: '/publicHome',
       routes: {
-        '/publicHome': (context) => const HomeScreen(), // old welcome home
+        '/publicHome': (context) => const HomeScreen(), // for new visitors
         '/auth': (context) => const AuthScreen(),
         '/profileSetup': (context) => const ProfileSetupScreen(),
-        '/home': (context) => const HomeLoggedScreen(), // new logged-in dashboard
-        '/tracker': (context) => const TrackerScreen(),
+        '/home': (context) => const HomeLoggedScreen(), // for logged-in users
+        '/tracker': (context) => const PeriodTrackerScreen(),
         '/education': (context) => const EducationScreen(),
       },
     );
   }
 }
 
-// Optional bottom navigation (used only for logged-in screens)
+// ✅ Optional bottom navigation (for logged-in users)
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -67,8 +67,8 @@ class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = const [
-    HomeLoggedScreen(), // logged-in home
-    TrackerScreen(),
+    HomeLoggedScreen(),
+    PeriodTrackerScreen(),
     EducationScreen(),
     AuthScreen(),
   ];
