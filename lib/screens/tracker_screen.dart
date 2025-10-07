@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../theme.dart';
+import 'period_tracker_screen.dart'; 
 
 class TrackerScreen extends StatelessWidget {
   const TrackerScreen({super.key});
@@ -38,15 +39,27 @@ class TrackerScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
-              onPressed: () {},
+              onPressed: () {
+                // ✅ Navigate to the period tracker form screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PeriodTrackerScreen(),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.accent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
               ),
-              label: const Text('Log Period', style: TextStyle(fontSize: 16, color: Colors.white)),
+              label: const Text(
+                'Log Period',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         ),
