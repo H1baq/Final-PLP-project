@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'profile_screen.dart'; // ✅ import your profile screen
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -13,12 +11,10 @@ class ProfileSetupScreen extends StatefulWidget {
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Basic user menstrual data
   int _cycleLength = 28;
   int _periodLength = 5;
   DateTime? _lastPeriodDate;
 
-  // Extra details
   String _flowType = 'Moderate';
   String _symptomPattern = 'Occasional cramps';
   bool _usesBirthControl = false;
@@ -40,20 +36,31 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (_lastPeriodDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select last period date'),
+          backgroundColor: Colors.pink,
+        ),
+      );
+      return;
+    }
 
-    // (Later we’ll connect this to Firestore)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Profile saved successfully! 💕'),
-        backgroundColor: Colors.pink,
+    // ⭐ Navigate directly to the Profile Screen with the provided data
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfileScreen(
+          cycleLength: _cycleLength,
+          periodLength: _periodLength,
+          lastPeriodDate: _lastPeriodDate!,
+          flowType: _flowType,
+          symptomPattern: _symptomPattern,
+          moodPattern: _moodPattern,
+          usesBirthControl: _usesBirthControl,
+        ),
       ),
     );
-
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, '/home');
-    });
   }
 
   @override
@@ -87,7 +94,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 25),
 
-                  // Cycle length
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Average Cycle Length (days)',
@@ -96,17 +102,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     initialValue: _cycleLength.toString(),
                     keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || int.tryParse(value) == null) {
-                        return 'Enter a valid number';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _cycleLength = int.tryParse(value!) ?? 28,
+                    validator: (value) => value == null || int.tryParse(value) == null
+                        ? 'Enter a valid number'
+                        : null,
+                    onSaved: (value) => _cycleLength = int.parse(value!),
                   ),
                   const SizedBox(height: 15),
 
-                  // Period length
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Average Period Length (days)',
@@ -115,17 +117,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     initialValue: _periodLength.toString(),
                     keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || int.tryParse(value) == null) {
-                        return 'Enter a valid number';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => _periodLength = int.tryParse(value!) ?? 5,
+                    validator: (value) => value == null || int.tryParse(value) == null
+                        ? 'Enter a valid number'
+                        : null,
+                    onSaved: (value) => _periodLength = int.parse(value!),
                   ),
                   const SizedBox(height: 15),
 
-                  // Last period date
                   ListTile(
                     title: Text(
                       _lastPeriodDate == null
@@ -142,7 +140,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 15),
 
-                  // Flow intensity dropdown
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Typical Flow Intensity',
@@ -160,7 +157,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 15),
 
-                  // Symptom pattern dropdown
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Common Symptoms',
@@ -169,17 +165,22 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     ),
                     value: _symptomPattern,
                     items: const [
-                      DropdownMenuItem(value: 'No major symptoms', child: Text('No major symptoms')),
-                      DropdownMenuItem(value: 'Occasional cramps', child: Text('Occasional cramps')),
-                      DropdownMenuItem(value: 'Severe cramps', child: Text('Severe cramps')),
-                      DropdownMenuItem(value: 'Mood swings', child: Text('Mood swings')),
+                      DropdownMenuItem(
+                          value: 'No major symptoms',
+                          child: Text('No major symptoms')),
+                      DropdownMenuItem(
+                          value: 'Occasional cramps',
+                          child: Text('Occasional cramps')),
+                      DropdownMenuItem(
+                          value: 'Severe cramps', child: Text('Severe cramps')),
+                      DropdownMenuItem(
+                          value: 'Mood swings', child: Text('Mood swings')),
                     ],
                     onChanged: (value) => setState(() => _symptomPattern = value!),
                     onSaved: (value) => _symptomPattern = value!,
                   ),
                   const SizedBox(height: 15),
 
-                  // Mood pattern dropdown
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Mood Pattern',
@@ -189,15 +190,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     value: _moodPattern,
                     items: const [
                       DropdownMenuItem(value: 'Stable', child: Text('Stable')),
-                      DropdownMenuItem(value: 'Mild mood swings', child: Text('Mild mood swings')),
-                      DropdownMenuItem(value: 'Frequent mood swings', child: Text('Frequent mood swings')),
+                      DropdownMenuItem(
+                          value: 'Mild mood swings',
+                          child: Text('Mild mood swings')),
+                      DropdownMenuItem(
+                          value: 'Frequent mood swings',
+                          child: Text('Frequent mood swings')),
                     ],
                     onChanged: (value) => setState(() => _moodPattern = value!),
                     onSaved: (value) => _moodPattern = value!,
                   ),
                   const SizedBox(height: 15),
 
-                  // Birth control toggle
                   SwitchListTile(
                     title: const Text('Using Birth Control'),
                     activeColor: Colors.pink,
@@ -206,12 +210,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   ),
                   const SizedBox(height: 25),
 
-                  // Save button
                   ElevatedButton(
                     onPressed: _submitProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink,
-                      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 14),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 60, vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
