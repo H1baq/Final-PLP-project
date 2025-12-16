@@ -10,7 +10,7 @@ class PeriodTrackerScreen extends StatefulWidget {
 }
 
 class _PeriodTrackerScreenState extends State<PeriodTrackerScreen> {
-  DateTime _focusedDay = DateTime.now();
+  final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
   String? _flowLevel;
@@ -92,7 +92,7 @@ class _PeriodTrackerScreenState extends State<PeriodTrackerScreen> {
 
               // Flow level dropdown
               DropdownButtonFormField<String>(
-                value: _flowLevel,
+                initialValue: _flowLevel,
                 decoration: InputDecoration(
                   labelText: 'Flow Level',
                   border: OutlineInputBorder(
