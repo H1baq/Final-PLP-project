@@ -68,6 +68,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
       setState(() => _loading = false);
 
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -84,6 +85,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       );
     } catch (e) {
       setState(() => _loading = false);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error saving profile: $e")),
       );
@@ -181,7 +183,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.favorite),
                         ),
-                        value: _flowType,
+                        initialValue: _flowType,
                         items: const [
                           DropdownMenuItem(value: 'Light', child: Text('Light')),
                           DropdownMenuItem(value: 'Moderate', child: Text('Moderate')),
@@ -199,7 +201,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.medical_services),
                         ),
-                        value: _symptomPattern,
+                        initialValue: _symptomPattern,
                         items: const [
                           DropdownMenuItem(
                               value: 'No major symptoms',
@@ -224,7 +226,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.sentiment_satisfied),
                         ),
-                        value: _moodPattern,
+                        initialValue: _moodPattern,
                         items: const [
                           DropdownMenuItem(value: 'Stable', child: Text('Stable')),
                           DropdownMenuItem(
@@ -242,7 +244,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                       // Birth control toggle
                       SwitchListTile(
                         title: const Text('Using Birth Control'),
-                        activeColor: Colors.pink,
+                        activeThumbColor: Colors.pink,
                         value: _usesBirthControl,
                         onChanged: (value) =>
                             setState(() => _usesBirthControl = value),
