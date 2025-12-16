@@ -38,7 +38,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
       } else {
         //  SIGN UP FLOW
-        final userCredential = await _auth.createUserWithEmailAndPassword(
+        await _auth.createUserWithEmailAndPassword(
           email: _email,
           password: _password,
         );
