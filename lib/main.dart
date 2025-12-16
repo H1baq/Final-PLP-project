@@ -11,6 +11,7 @@ import 'screens/period_tracker_screen.dart';
 import 'screens/education_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile_setup_screen.dart';
+import 'screens/insights_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,12 +51,13 @@ class KnowYourFlowApp extends StatelessWidget {
         '/home': (context) => const HomeLoggedScreen(), // for logged-in users
         '/tracker': (context) => const PeriodTrackerScreen(),
         '/education': (context) => const EducationScreen(),
+        '/insights': (context) => const WellnessInsightsScreen(),
+
       },
     );
   }
 }
 
-// ✅ Optional bottom navigation (for logged-in users)
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 

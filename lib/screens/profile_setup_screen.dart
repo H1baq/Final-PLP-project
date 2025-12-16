@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'profile_screen.dart'; // ✅ import your profile screen
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'profile_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -10,6 +12,8 @@ class ProfileSetupScreen extends StatefulWidget {
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  bool _loading = false;
 
   int _cycleLength = 28;
   int _periodLength = 5;
@@ -46,21 +50,44 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       return;
     }
 
-    // ⭐ Navigate directly to the Profile Screen with the provided data
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfileScreen(
-          cycleLength: _cycleLength,
-          periodLength: _periodLength,
-          lastPeriodDate: _lastPeriodDate!,
-          flowType: _flowType,
-          symptomPattern: _symptomPattern,
-          moodPattern: _moodPattern,
-          usesBirthControl: _usesBirthControl,
+    try {
+      setState(() => _loading = true);
+
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      await FirebaseFirestore.instance.collection("users").doc(uid).set({
+        "cycleLength": _cycleLength,
+        "periodLength": _periodLength,
+        "lastPeriodDate": _lastPeriodDate!.toIso8601String(),
+        "flowType": _flowType,
+        "symptomPattern": _symptomPattern,
+        "moodPattern": _moodPattern,
+        "usesBirthControl": _usesBirthControl,
+        "updatedAt": DateTime.now(),
+      });
+
+      setState(() => _loading = false);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileScreen(
+            cycleLength: _cycleLength,
+            periodLength: _periodLength,
+            lastPeriodDate: _lastPeriodDate!,
+            flowType: _flowType,
+            symptomPattern: _symptomPattern,
+            moodPattern: _moodPattern,
+            usesBirthControl: _usesBirthControl,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving profile: $e")),
+      );
+    }
   }
 
   @override
@@ -72,164 +99,184 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         title: const Text('Set Up Your Profile'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 3,
-          child: Padding(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const Text(
-                    'Let’s personalize your experience 💕',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.pink,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 25),
-
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Average Cycle Length (days)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.timer),
-                    ),
-                    initialValue: _cycleLength.toString(),
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value == null || int.tryParse(value) == null
-                        ? 'Enter a valid number'
-                        : null,
-                    onSaved: (value) => _cycleLength = int.parse(value!),
-                  ),
-                  const SizedBox(height: 15),
-
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Average Period Length (days)',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.water_drop),
-                    ),
-                    initialValue: _periodLength.toString(),
-                    keyboardType: TextInputType.number,
-                    validator: (value) => value == null || int.tryParse(value) == null
-                        ? 'Enter a valid number'
-                        : null,
-                    onSaved: (value) => _periodLength = int.parse(value!),
-                  ),
-                  const SizedBox(height: 15),
-
-                  ListTile(
-                    title: Text(
-                      _lastPeriodDate == null
-                          ? 'Select Last Period Start Date'
-                          : 'Last Period: ${_lastPeriodDate!.toLocal().toString().split(' ')[0]}',
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: _pickDate,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Let’s personalize your experience 💕',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.pink,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      child: const Text('Pick Date'),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
+                      const SizedBox(height: 25),
 
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Typical Flow Intensity',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.favorite),
-                    ),
-                    value: _flowType,
-                    items: const [
-                      DropdownMenuItem(value: 'Light', child: Text('Light')),
-                      DropdownMenuItem(value: 'Moderate', child: Text('Moderate')),
-                      DropdownMenuItem(value: 'Heavy', child: Text('Heavy')),
-                    ],
-                    onChanged: (value) => setState(() => _flowType = value!),
-                    onSaved: (value) => _flowType = value!,
-                  ),
-                  const SizedBox(height: 15),
-
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Common Symptoms',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.medical_services),
-                    ),
-                    value: _symptomPattern,
-                    items: const [
-                      DropdownMenuItem(
-                          value: 'No major symptoms',
-                          child: Text('No major symptoms')),
-                      DropdownMenuItem(
-                          value: 'Occasional cramps',
-                          child: Text('Occasional cramps')),
-                      DropdownMenuItem(
-                          value: 'Severe cramps', child: Text('Severe cramps')),
-                      DropdownMenuItem(
-                          value: 'Mood swings', child: Text('Mood swings')),
-                    ],
-                    onChanged: (value) => setState(() => _symptomPattern = value!),
-                    onSaved: (value) => _symptomPattern = value!,
-                  ),
-                  const SizedBox(height: 15),
-
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Mood Pattern',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.sentiment_satisfied),
-                    ),
-                    value: _moodPattern,
-                    items: const [
-                      DropdownMenuItem(value: 'Stable', child: Text('Stable')),
-                      DropdownMenuItem(
-                          value: 'Mild mood swings',
-                          child: Text('Mild mood swings')),
-                      DropdownMenuItem(
-                          value: 'Frequent mood swings',
-                          child: Text('Frequent mood swings')),
-                    ],
-                    onChanged: (value) => setState(() => _moodPattern = value!),
-                    onSaved: (value) => _moodPattern = value!,
-                  ),
-                  const SizedBox(height: 15),
-
-                  SwitchListTile(
-                    title: const Text('Using Birth Control'),
-                    activeColor: Colors.pink,
-                    value: _usesBirthControl,
-                    onChanged: (value) => setState(() => _usesBirthControl = value),
-                  ),
-                  const SizedBox(height: 25),
-
-                  ElevatedButton(
-                    onPressed: _submitProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 60, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                      // Cycle Length
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Average Cycle Length (days)',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.timer),
+                        ),
+                        initialValue: _cycleLength.toString(),
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || int.tryParse(value) == null
+                            ? 'Enter a valid number'
+                            : null,
+                        onSaved: (value) => _cycleLength = int.parse(value!),
                       ),
-                    ),
-                    child: const Text(
-                      'Save Profile',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
+                      const SizedBox(height: 15),
+
+                      // Period Length
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Average Period Length (days)',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.water_drop),
+                        ),
+                        initialValue: _periodLength.toString(),
+                        keyboardType: TextInputType.number,
+                        validator: (value) => value == null || int.tryParse(value) == null
+                            ? 'Enter a valid number'
+                            : null,
+                        onSaved: (value) => _periodLength = int.parse(value!),
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Date picker
+                      ListTile(
+                        title: Text(
+                          _lastPeriodDate == null
+                              ? 'Select Last Period Start Date'
+                              : 'Last Period: ${_lastPeriodDate!.toLocal().toString().split(' ')[0]}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        trailing: ElevatedButton(
+                          onPressed: _pickDate,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.pink,
+                          ),
+                          child: const Text('Pick Date'),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Flow type
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Typical Flow Intensity',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.favorite),
+                        ),
+                        value: _flowType,
+                        items: const [
+                          DropdownMenuItem(value: 'Light', child: Text('Light')),
+                          DropdownMenuItem(value: 'Moderate', child: Text('Moderate')),
+                          DropdownMenuItem(value: 'Heavy', child: Text('Heavy')),
+                        ],
+                        onChanged: (value) => setState(() => _flowType = value!),
+                        onSaved: (value) => _flowType = value!,
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Symptoms
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Common Symptoms',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.medical_services),
+                        ),
+                        value: _symptomPattern,
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'No major symptoms',
+                              child: Text('No major symptoms')),
+                          DropdownMenuItem(
+                              value: 'Occasional cramps',
+                              child: Text('Occasional cramps')),
+                          DropdownMenuItem(
+                              value: 'Severe cramps', child: Text('Severe cramps')),
+                          DropdownMenuItem(
+                              value: 'Mood swings', child: Text('Mood swings')),
+                        ],
+                        onChanged: (value) => setState(() => _symptomPattern = value!),
+                        onSaved: (value) => _symptomPattern = value!,
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Mood
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Mood Pattern',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.sentiment_satisfied),
+                        ),
+                        value: _moodPattern,
+                        items: const [
+                          DropdownMenuItem(value: 'Stable', child: Text('Stable')),
+                          DropdownMenuItem(
+                              value: 'Mild mood swings',
+                              child: Text('Mild mood swings')),
+                          DropdownMenuItem(
+                              value: 'Frequent mood swings',
+                              child: Text('Frequent mood swings')),
+                        ],
+                        onChanged: (value) => setState(() => _moodPattern = value!),
+                        onSaved: (value) => _moodPattern = value!,
+                      ),
+                      const SizedBox(height: 15),
+
+                      // Birth control toggle
+                      SwitchListTile(
+                        title: const Text('Using Birth Control'),
+                        activeColor: Colors.pink,
+                        value: _usesBirthControl,
+                        onChanged: (value) =>
+                            setState(() => _usesBirthControl = value),
+                      ),
+                      const SizedBox(height: 25),
+
+                      // Save button
+                      ElevatedButton(
+                        onPressed: _loading ? null : _submitProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 60, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: _loading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                'Save Profile',
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
