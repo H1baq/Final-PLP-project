@@ -38,7 +38,6 @@ class KnowYourFlowApp extends StatelessWidget {
       title: 'Know Your Flow',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      useInheritedMediaQuery: true, // ✅ For DevicePreview
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
 
