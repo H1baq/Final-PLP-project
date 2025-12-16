@@ -93,7 +93,7 @@ class TrackerInsightsScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: AppTheme.accent.withOpacity(0.15),
+              backgroundColor: AppTheme.accent.withValues(alpha: 0.15),
               child: Icon(icon, color: AppTheme.accent, size: 28),
             ),
             const SizedBox(width: 16),
