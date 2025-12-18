@@ -216,6 +216,126 @@ Only guard with `if (!mounted) return;`.
 
 ---
 
+### 1️⃣ Verifying Wellness Insights vs Profile Data (Mock vs Real)
+
+```
+Go through my Flutter project and verify whether the Wellness / Insights data
+is actually derived from real user profile and tracking data or if it is
+currently mock/mockup data.
+
+Context:
+- Users provide real data during Profile Setup.
+- There is a Wellness / Insights section that displays tips or insights.
+- I suspect the insights are not using the saved profile or tracked data,
+  but instead hardcoded or placeholder values.
+
+Tasks:
+1. Trace the data flow end-to-end:
+   - Profile Setup → Firestore → Insights
+2. Identify:
+   - Hardcoded insight values
+   - Mock lists or placeholder logic
+   - Mismatches between Firestore fields and Insights expectations
+3. Explain:
+   - What data is real vs mock
+   - Why the mismatch exists
+   - Which files are responsible
+
+Fix (only if safe):
+- Replace mock inputs with real user data where possible.
+- Add safe fallbacks if data is missing.
+- Ensure correct Firestore path (users/{uid}).
+- Do NOT change UI or navigation.
+- Keep changes minimal.
+
+Rules:
+- Flutter 3.13+ compatible
+- Null-safe
+- Minimal diffs
+- No medical claims
+- Explain changes per file
+```
+
+---
+
+### 2️⃣ Implementing Custom Insights (AI-Simulated Feature)
+
+```
+Go through my existing Flutter project Know Your Flow and help me implement
+the “Custom Insights” feature in alignment with the current architecture.
+
+Context:
+- Period tracking and profile data already exist.
+- Firebase Authentication and Firestore are used.
+- No real AI API calls yet.
+
+Feature Goal:
+- Provide personalized, AI-style health tips based on:
+  - Cycle data
+  - Symptoms
+  - Moods
+
+Constraints:
+- No behavior, UI, or navigation changes unless necessary.
+- No external AI APIs.
+- Use rule-based or placeholder logic.
+- Design so real AI can be added later.
+
+Tasks:
+1. Analyze current project structure and models.
+2. Propose where insight logic should live.
+3. Implement an Insights service that:
+   - Consumes tracked data
+   - Returns personalized insight strings
+4. Integrate minimally with existing UI.
+5. Explain how this simulates AI reasoning and prepares for real AI later.
+
+Rules:
+- Flutter 3.13+
+- Null-safe
+- Minimal diffs
+- Explain changes per file
+```
+
+---
+
+### 3️⃣ Adding Navigation from Cycle Overview to Wellness Insights
+
+```
+Analyze my Flutter project and implement a minimal navigation addition
+from the Cycle Overview screen to the Wellness / Insights screen.
+
+Context:
+- After profile setup, users are navigated to Cycle Overview.
+- A Wellness / Insights screen already exists.
+
+Feature:
+- Add one button on the Cycle Overview screen
+- Label it clearly (e.g. “View Wellness Insights”)
+- Navigate to the existing Wellness / Insights screen
+
+Constraints:
+- Preserve existing navigation flow.
+- No refactors or rewrites.
+- No Firebase or auth changes.
+- Minimal UI changes consistent with current styling.
+
+Tasks:
+1. Identify Cycle Overview screen.
+2. Identify Wellness / Insights route.
+3. Add button and wire navigation.
+4. Ensure only authenticated users can navigate.
+
+Rules:
+- Flutter 3.13+
+- Null-safe
+- Minimal diffs
+- Explain changes per file
+```
+
+---
+
+
 ### AI Prompting Philosophy
 
 1. **Clear Context:** Each prompt included file path, warning/error type, and desired safe behavior.
