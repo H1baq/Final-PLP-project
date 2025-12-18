@@ -1,0 +1,206 @@
+# Custom Insights Feature Implementation – AI Learning Documentation
+
+## 1. Title & Objective
+
+**Feature:** Custom Insights – AI-style personalized wellness tips
+**Technology:** Flutter (Dart) + Firebase + AI-assisted design
+**Why:** To explore AI-assisted development and understand Flutter best practices while enhancing Know Your Flow.
+**End Goal:** Implement a feature that generates supportive, educational wellness insights based on user profile data, preparing for future AI integration.
+
+---
+
+## 2. Quick Summary of the Technology
+
+**Flutter:** Open-source UI toolkit by Google for building natively compiled applications across mobile, web, and desktop from a single codebase.
+**Firebase:** Backend-as-a-Service, handling authentication, database (Firestore), and cloud storage.
+**AI/Prompts:** Cursor/GPT used to fix warnings, improve architecture, and design AI-ready features.
+
+**Real-World Example:** Health apps (like Clue or Know know_your_flow) offering personalized insights based on tracked cycles, symptoms, and moods.
+
+---
+
+## 3. System Requirements
+
+* **OS:** Linux/Mac/Windows
+* **Editor/IDE:** VS Code, Android Studio
+* **Packages/Tools:**
+
+  * Flutter 3.13+
+  * Dart SDK
+  * Firebase CLI
+  * pub dependencies via `flutter pub get`
+
+---
+
+## 4. Installation & Setup Instructions
+
+1. **Clone the repository:**
+
+```bash
+git clone <repository-url>
+cd know_your_flow
+```
+
+2. **Install dependencies:**
+
+```bash
+flutter pub get
+```
+
+3. **Setup Firebase:**
+
+* Add `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
+* Ensure Firestore and Firebase Authentication are enabled
+
+4. **Run the app:**
+
+* **Web:** `flutter run -d chrome`
+* **Android:** `flutter run -d <device-id>`
+* **iOS:** `flutter run -d <device-id>`
+
+---
+
+## 5. Minimal Working Example
+
+**What it does:**
+
+* Reads user profile data from Firestore
+* Generates personalized wellness insights using `InsightsService`
+* Displays insights dynamically in the `InsightsScreen`
+
+**Key Code Snippet (Service Layer):**
+
+```dart
+List<Insight> generateProfileInsights(InsightProfileInput input) {
+  final insights = <Insight>[];
+  
+  insights.add(Insight(
+    title: 'Your Cycle Rhythm',
+    description: _buildCycleLengthInsight(...),
+  ));
+  
+  return insights;
+}
+```
+
+**Expected Output:**
+
+* A list of personalized, educational insights rendered as cards in the app, reflecting the user’s cycle, mood, and symptoms.
+
+---
+
+## 6. AI Prompt Journal
+
+### 1️⃣ Fixing Flutter Warnings & Deprecated APIs
+
+**Prompt Used:**
+
+```
+Go through this Flutter project and fix all reported analyzer warnings:
+- deprecated_member_use
+- unused_local_variable
+- prefer_final_fields
+- use_build_context_synchronously
+Rules:
+- No behavior, UI, or navigation changes
+- Minimal diffs
+- Flutter 3.13+ compatible
+- Explain changes per file after completion
+```
+
+**AI’s Response Summary:** Refactored deprecated APIs, removed unused variables, added `mounted` checks for async context.
+**Evaluation:** Extremely helpful; maintained project stability while learning best practices.
+
+---
+
+### 2️⃣ Fixing Firestore Permission Errors
+
+**Prompt Used:**
+
+```
+There is a Firestore permission-denied error when saving a user profile.
+Task:
+- Ensure user is authenticated
+- Ensure Firestore rules match users/{uid}
+- Fix code or rules minimally
+- Explain root cause
+```
+
+**AI’s Response Summary:** Diagnosed permission-denied issue; suggested rule changes and minor code fixes to match user UID.
+**Evaluation:** Very helpful; taught secure Firestore usage.
+
+---
+
+### 3️⃣ Refactoring Deprecated API Usage
+
+**Prompt Used:**
+
+```
+Replace deprecated Color.withOpacity(), FormField 'value' parameters
+with Flutter 3.13+ compatible equivalents. Keep UI unchanged.
+```
+
+**Evaluation:** Learned to identify deprecated methods and safely update them.
+
+---
+
+### 4️⃣ Handling Async Context Warnings
+
+**Prompt Used:**
+
+```
+Fix use_build_context_synchronously warnings by adding mounted checks.
+Do not restructure async logic or move navigation/context usage.
+```
+
+**Evaluation:** Reinforced Flutter async best practices.
+
+---
+
+### 5️⃣ Implementing Custom Insights Feature
+
+**Prompt Used:**
+
+```
+Add a Custom Insights feature:
+- Generates AI-style wellness tips based on user profile
+- Reads real user profile data from Firestore
+- Displays dynamic insights in a dedicated screen
+- Future-ready for AI API integration
+```
+
+**Evaluation:** Helped design service layer, DTO pattern, and prepare architecture for real AI integration.
+
+---
+
+### 6️⃣ Adding Navigation from Cycle Overview to Wellness Insights
+
+**Prompt Used:**
+
+```
+After saving the profile, add a button in Cycle Overview:
+- Navigates to Wellness Insights screen
+- Uses existing '/insights' route
+- Maintain app styling
+```
+
+**Evaluation:** Learned clean Flutter navigation patterns and minimal UI change strategies.
+
+---
+
+## 7. Common Issues & Fixes
+
+* **Issue:** Firestore permission-denied
+  **Fix:** Corrected Firestore rules, ensured user UID matches document path
+* **Issue:** Deprecated API warnings
+  **Fix:** Updated `withOpacity()`, `FormField.value`, and other APIs
+* **Issue:** Async context warnings
+  **Fix:** Added `if (!mounted) return;` guards
+
+---
+
+## 8. References
+
+* [Flutter Official Docs](https://flutter.dev/docs)
+* [Firebase Firestore Docs](https://firebase.google.com/docs/firestore)
+* Cursor/GPT AI prompts and examples
